@@ -58,8 +58,12 @@ export function HashtagsPage() {
             </Helmet>
             <Waiting for={hashtags}>
                 <main className="w-full flex flex-col justify-center items-center mb-8 ani-show">
-                    <div className="wauto text-start py-4 text-4xl font-bold">
-                        <p className="text-black dark:text-white">
+                    <div className="wauto text-start py-6">
+                        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-theme">
+                            <span className="h-[3px] w-7 rounded-full bg-theme" aria-hidden="true" />
+                            Tags
+                        </div>
+                        <p className="text-black dark:text-white mt-2 text-3xl font-bold tracking-tight">
                             {t('hashtags')}
                         </p>
                         <div className="flex flex-row justify-between">

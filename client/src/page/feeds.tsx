@@ -79,8 +79,12 @@ export function FeedsPage() {
             </Helmet>
             <Waiting for={feeds.draft.size + feeds.normal.size + feeds.unlisted.size > 0 || status === 'idle'}>
                 <main className="w-full flex flex-col justify-center items-center mb-8">
-                    <div className="wauto text-start text-black dark:text-white py-4 text-4xl font-bold">
-                        <p>
+                    <div className="wauto text-start text-black dark:text-white py-6">
+                        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-theme">
+                            <span className="h-[3px] w-7 rounded-full bg-theme" aria-hidden="true" />
+                            Blog
+                        </div>
+                        <p className="mt-2 text-3xl font-bold tracking-tight">
                             {listState === 'draft' ? t('draft_bin') : listState === 'normal' ? t('article.title') : t('unlisted')}
                         </p>
                         <div className="flex flex-row justify-between">

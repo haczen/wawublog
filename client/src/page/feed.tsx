@@ -223,7 +223,7 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                       </span>
                     </p>}
                     <div className="flex flex-row items-center">
-                      <h1 className="text-2xl font-bold t-primary break-all">
+                      <h1 className="text-3xl font-bold t-primary break-all tracking-tight">
                         {feed.title}
                       </h1>
                       <div className="flex-1 w-0" />
