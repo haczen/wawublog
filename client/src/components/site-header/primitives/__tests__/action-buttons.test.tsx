@@ -63,6 +63,14 @@ describe("UserAvatar", () => {
     expect(container.childElementCount).toBe(0);
   });
 
+  it("shows a labeled login button when login is enabled and the user is signed out", () => {
+    const { container } = renderUserAvatar({ loginEnabled: true, profile: null });
+
+    const button = within(container).getByRole("button", { name: "login.title" });
+    expect(button.isConnected).toBe(true);
+    expect(within(button).getByText("login.title").isConnected).toBe(true);
+  });
+
   it("shows the avatar menu when login is disabled but the user is signed in", () => {
     const { container } = renderUserAvatar({
       loginEnabled: false,

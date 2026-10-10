@@ -140,7 +140,7 @@ export function UserAvatar({
 }) {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
-  const label = t("github_login");
+  const label = t("login.title");
   const config = useContext(ClientConfigContext);
   const [isOpen, setIsOpen] = useState(false);
   const shouldShowEntry = Boolean(profile) || config.getBoolean("login.enabled");
@@ -231,13 +231,10 @@ export function UserAvatar({
           onClick={() => setLocation("/login")}
           title={label}
           aria-label={label}
-          className={
-            plain
-              ? "flex h-8 w-8 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-white/10 dark:hover:text-neutral-100"
-              : "flex rounded-full border dark:border-neutral-600 px-2 bg-w aspect-[1] items-center justify-center t-primary bg-button"
-          }
+          className="flex shrink-0 items-center gap-1.5 rounded-full border border-black/10 bg-w bg-button px-3.5 py-1.5 text-sm font-medium t-primary transition-colors dark:border-white/10"
         >
           <i className="ri-user-received-line" />
+          <span>{label}</span>
         </button>
       )}
     </div>
