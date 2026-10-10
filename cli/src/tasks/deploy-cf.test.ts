@@ -2,7 +2,9 @@ import { describe, expect, it } from "bun:test";
 import {
   buildWranglerObservabilityConfig,
   buildWranglerQueueConfig,
+  buildWranglerRoutesConfig,
   buildWranglerTriggersConfig,
+  buildWorkersDevConfig,
   collectWorkerSecrets,
 } from "./deploy-cf";
 
@@ -65,6 +67,38 @@ describe("buildWranglerQueueConfig", () => {
     const config = buildWranglerQueueConfig("rin-tasks", false);
     expect(config).toContain("[[queues.producers]]");
     expect(config).toContain("[[queues.consumers]]");
+  });
+});
+
+describe("buildWranglerRoutesConfig", () => {
+  it("omits routes when no domain is configured", () => {
+    expect(buildWranglerRoutesConfig("", false)).toBe("");
+  });
+
+  it("omits routes for preview deploys", () => {
+    expect(buildWranglerRoutesConfig("wawu.cc.cd", true)).toBe("");
+  });
+
+  it("attaches the domain as a custom domain for production deploys", () => {
+    const config = buildWranglerRoutesConfig("wawu.cc.cd", false);
+    expect(config).toContain('routes = [');
+    expect(config).toContain('{ pattern = "wawu.cc.cd", custom_domain = true }');
+  });
+
+  it("attaches multiple comma-separated domains", () => {
+    const config = buildWranglerRoutesConfig("wawu.cc.cd, www.wawu.cc.cd", false);
+    expect(config).toContain('{ pattern = "wawu.cc.cd", custom_domain = true }');
+    expect(config).toContain('{ pattern = "www.wawu.cc.cd", custom_domain = true }');
+  });
+});
+
+describe("buildWorkersDevConfig", () => {
+  it("omits workers_dev when disabled", () => {
+    expect(buildWorkersDevConfig(false)).toBe("");
+  });
+
+  it("enables the workers.dev route when enabled", () => {
+    expect(buildWorkersDevConfig(true)).toContain("workers_dev = true");
   });
 });
 

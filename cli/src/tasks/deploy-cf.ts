@@ -101,6 +101,31 @@ export function buildWranglerTriggersConfig(preview = false) {
       `);
 }
 
+export function buildWranglerRoutesConfig(domain: string, preview = false) {
+  if (preview || !domain) {
+    return "";
+  }
+  const domains = domain
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (domains.length === 0) {
+    return "";
+  }
+  const routes = domains.map((item) => `      { pattern = "${item}", custom_domain = true },`);
+  return stripIndent(`
+    routes = [
+      ${routes.join("\n")}
+    ]
+  `);
+}
+
+export function buildWorkersDevConfig(enabled: boolean) {
+  return enabled ? stripIndent(`
+      workers_dev = true
+    `) : "";
+}
+
 export function buildWranglerQueueConfig(taskQueueName: string, preview = false) {
   return stripIndent(`
     [[queues.producers]]
@@ -168,6 +193,8 @@ export async function runCloudflareDeploy(target: "all" | "server" | "client" = 
   const pageSize = env("PAGE_SIZE", "5");
   const rssEnable = env("RSS_ENABLE", "false");
   const frontendUrl = env("FRONTEND_URL", "");
+  const workerDomain = env("WORKER_DOMAIN", "");
+  const workersDev = env("WORKERS_DEV", "false") === "true";
 
   let finalS3Endpoint = s3Endpoint;
   let finalS3Bucket = s3Bucket;
@@ -196,6 +223,7 @@ export async function runCloudflareDeploy(target: "all" | "server" | "client" = 
       name = "${workerName}"
       main = "${serverMain}"
       compatibility_date = "2026-01-20"
+      ${buildWorkersDevConfig(workersDev)}${buildWranglerRoutesConfig(workerDomain, preview)}
 
       [assets]
       directory = "./dist/client"
