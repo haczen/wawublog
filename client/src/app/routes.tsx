@@ -161,7 +161,12 @@ function AppRoute({
 
         return layoutDefinition.renderRouteShell({
           header: <Header>{headerComponent}</Header>,
-          content: <Padding className={paddingClassName}>{resolvedContent}</Padding>,
+          content:
+            paddingClassName === "none" ? (
+              resolvedContent
+            ) : (
+              <Padding className={paddingClassName}>{resolvedContent}</Padding>
+            ),
           footer: <Footer />,
           paddingClassName,
         });
@@ -209,7 +214,7 @@ function TocRoute({
   const { TOC, cleanup } = useTableOfContents(".toc-content");
 
   return (
-    <AppRoute path={path} headerComponent={TOCHeader({ TOC })} paddingClassName="mx-4">
+    <AppRoute path={path} headerComponent={TOCHeader({ TOC })} paddingClassName="none">
       {(params) => children(params, TOC, cleanup)}
     </AppRoute>
   );

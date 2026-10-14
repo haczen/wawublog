@@ -1,4 +1,3 @@
-import { Padding } from "@rin/ui";
 import { BrandLink, HeaderActions, MobileTopHeader, NavBar } from "..";
 import { SiteSidebar } from "../../site-sidebar";
 import { PreviewActions, PreviewBrand, PreviewCanvas, PreviewContent, PreviewNav } from "../preview-primitives";
@@ -69,7 +68,7 @@ export const compactLayoutDefinition: HeaderLayoutDefinition = {
     return (
       <div className="flex min-h-screen flex-col">
         {header}
-        <Padding className="mx-0 flex-1">
+        <div className="mx-4 flex-1 sm:mx-6 md:mx-8">
           <div className="flex w-full items-start gap-6">
             <SiteSidebar />
             <div className="min-w-0 w-full">
@@ -77,7 +76,7 @@ export const compactLayoutDefinition: HeaderLayoutDefinition = {
               {footer}
             </div>
           </div>
-        </Padding>
+        </div>
       </div>
     );
   },

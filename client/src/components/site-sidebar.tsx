@@ -35,6 +35,12 @@ export function SiteSidebar() {
     active?.scrollIntoView({ block: "nearest" });
   }, [currentId, feeds]);
 
+  // Article reading pages get the full width for content instead.
+  // (kept after all hooks so hook order stays stable across routes)
+  if (/^\/feed\/\d+/.test(location)) {
+    return null;
+  }
+
   const onSearch = () => {
     const trimmed = keyword.trim();
     if (trimmed.length > 0) setLocation(`/search/${encodeURIComponent(trimmed)}`);
