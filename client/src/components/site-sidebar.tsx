@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "wouter";
 import { client } from "../app/runtime";
+import { useArticleToc } from "../state/article-toc";
 
 interface TimelineItem {
   id: number;
@@ -20,26 +21,24 @@ export function SiteSidebar() {
   const [keyword, setKeyword] = useState("");
   const navRef = useRef<HTMLElement>(null);
   const loaded = useRef(false);
+  const articleToc = useArticleToc();
   const currentId = location.match(/^\/feed\/(\d+)/)?.[1];
+  // Article routes swap the article navigation for the reading page's TOC.
+  const isArticleRoute = /^\/feed\/\d+/.test(location) || articleToc !== null;
 
   useEffect(() => {
+    if (isArticleRoute) return;
     if (loaded.current) return;
     loaded.current = true;
     client.feed.timeline()
       .then(({ data }) => setFeeds(Array.isArray(data) ? data : []))
       .catch(() => setFeeds([]));
-  }, []);
+  }, [isArticleRoute]);
 
   useEffect(() => {
     const active = navRef.current?.querySelector<HTMLElement>('[data-active="true"]');
     active?.scrollIntoView({ block: "nearest" });
   }, [currentId, feeds]);
-
-  // Article reading pages get the full width for content instead.
-  // (kept after all hooks so hook order stays stable across routes)
-  if (/^\/feed\/\d+/.test(location)) {
-    return null;
-  }
 
   const onSearch = () => {
     const trimmed = keyword.trim();
@@ -75,7 +74,11 @@ export function SiteSidebar() {
           className="w-full min-w-0 bg-transparent text-sm t-primary outline-none"
         />
       </form>
-      {feeds && feeds.length > 0 ? (
+      {isArticleRoute ? (
+        articleToc ? (
+          <div className="min-h-0 flex-1 overflow-y-auto scrollbar-none">{articleToc}</div>
+        ) : null
+      ) : feeds && feeds.length > 0 ? (
         <nav
           ref={navRef}
           aria-label={t("article.title")}

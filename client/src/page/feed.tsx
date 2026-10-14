@@ -21,6 +21,7 @@ import { Tips } from "../components/tips";
 import mermaid from "mermaid";
 import { AdjacentSection } from "../components/adjacent_feed.tsx";
 import { stripImageUrlMetadata } from "../utils/image-upload";
+import { useSetArticleToc } from "../state/article-toc";
 
 function extractFirstMarkdownImageUrl(content: string) {
   const match = /!\[.*?\]\((\S+?)(?:\s+"[^"]*")?\)/.exec(content);
@@ -42,6 +43,7 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
   const [, setLocation] = useLocation();
   const { showAlert, AlertUI } = useAlert();
   const { showConfirm, ConfirmUI } = useConfirm();
+  const setArticleToc = useSetArticleToc();
   const [top, setTop] = useState<number>(0);
   const config = useContext(ClientConfigContext);
   const counterEnabled = config.getBoolean('counter.enabled');
@@ -131,6 +133,13 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
       });
     })
   }, [feed]);
+
+  // Surface this article's TOC in the left rail; clear it when leaving.
+  useEffect(() => {
+    setArticleToc(<TOC />);
+    return () => setArticleToc(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Waiting for={feed || error}>
@@ -308,13 +317,6 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
               {feed && <Comments id={`${feed.id}`} />}
               <div className="h-16" />
             </main>
-            <div className="w-64 2xl:w-80 hidden xl:block relative shrink-0">
-              <div
-                className={`start-0 end-0 top-[5.5rem] sticky`}
-              >
-                <TOC />
-              </div>
-            </div>
           </>
         )}
       </div>
