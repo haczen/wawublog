@@ -87,7 +87,9 @@ export function FeedService(): Hono<{
 
         const page_num = parsePositiveInteger(page, 1) - 1;
         const limit_num = parsePositiveInteger(limit, 20, 50);
-        const cacheKey = `feeds_${type}_${page_num}_${limit_num}`;
+        // Admin sees unlisted feeds mixed into the default list, so the cache
+        // must never be shared between admin and visitor responses.
+        const cacheKey = `feeds_${admin ? 'admin_' : ''}${type}_${page_num}_${limit_num}`;
         const cached = await profileAsync(c, 'feed_list_cache_get', () => cache.get(cacheKey));
 
         if (cached) {
@@ -98,7 +100,10 @@ export function FeedService(): Hono<{
             ? eq(feeds.draft, 1)
             : type === 'unlisted'
                 ? and(eq(feeds.draft, 0), eq(feeds.listed, 0))
-                : and(eq(feeds.draft, 0), eq(feeds.listed, 1));
+                : admin
+                    // Admin default view: everything (public + self-only + drafts)
+                    ? undefined
+                    : and(eq(feeds.draft, 0), eq(feeds.listed, 1));
 
         const size = await profileAsync(c, 'feed_list_count', () => db.select({ count: count() }).from(feeds).where(where));
 
@@ -150,11 +155,12 @@ export function FeedService(): Hono<{
     // GET /feed/timeline
     app.get('/timeline', async (c) => {
         const db = c.get('db');
-        const where = and(eq(feeds.draft, 0), eq(feeds.listed, 1));
+        const admin = c.get('admin');
+        const where = admin ? undefined : and(eq(feeds.draft, 0), eq(feeds.listed, 1));
 
         return c.json(await profileAsync(c, 'feed_timeline_db', () => db.query.feeds.findMany({
             where: where,
-            columns: { id: true, title: true, createdAt: true },
+            columns: { id: true, title: true, createdAt: true, listed: true, draft: true },
             orderBy: [desc(feeds.createdAt), desc(feeds.updatedAt)],
         })));
     });

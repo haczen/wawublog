@@ -85,7 +85,7 @@ export function FeedsPage() {
                             Blog
                         </div>
                         <p className="mt-2 text-3xl font-bold tracking-tight">
-                            {listState === 'draft' ? t('draft_bin') : listState === 'normal' ? t('article.title') : t('unlisted')}
+                            {listState === 'draft' ? t('draft_bin') : listState === 'normal' ? t('article.title') : t('visible.self_only')}
                         </p>
                         <div className="flex flex-row justify-between">
                             <p className="text-sm mt-4 text-neutral-500 font-normal">
@@ -97,7 +97,7 @@ export function FeedsPage() {
                                         {t('draft_bin')}
                                     </Link>
                                     <Link href={listState === 'unlisted' ? '/?type=normal' : '/?type=unlisted'} className={`text-sm mt-4 text-neutral-500 font-normal ${listState === 'unlisted' ? "text-theme" : ""}`}>
-                                        {t('unlisted')}
+                                        {t('visible.self_only')}
                                     </Link>
                                 </div>
                             }

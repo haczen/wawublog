@@ -11,6 +11,8 @@ interface FeedItem {
     id: number;
     createdAt: Date;
     title: string | null;
+    listed?: number;
+    draft?: number;
 }
 
 export function TimelinePage() {
@@ -85,9 +87,9 @@ export function TimelinePage() {
                                     </span>
                             </h1>
                             <div className="w-full flex flex-col justify-center items-start my-4">
-                                {feeds[+year]?.map(({ id, title, createdAt }) => (
-                                    <FeedItem key={id} id={id.toString()} title={title || t('unlisted')}
-                                              createdAt={new Date(createdAt)}/>
+                                {feeds[+year]?.map(({ id, title, createdAt, listed, draft }) => (
+                                    <FeedItem key={id} id={id.toString()} title={title || t('visible.self_only')}
+                                              createdAt={new Date(createdAt)} listed={listed} draft={draft}/>
                                 ))}
                             </div>
                         </div>
@@ -98,7 +100,8 @@ export function TimelinePage() {
     )
 }
 
-export function FeedItem({ id, title, createdAt }: { id: string, title: string, createdAt: Date }) {
+export function FeedItem({ id, title, createdAt, listed, draft }: { id: string, title: string, createdAt: Date, listed?: number, draft?: number }) {
+    const { t } = useTranslation()
     const formatter = new Intl.DateTimeFormat('en-US', { day: '2-digit', month: '2-digit' });
     return (
         <div className="flex min-w-0 flex-row pl-8">
@@ -109,6 +112,7 @@ export function FeedItem({ id, title, createdAt }: { id: string, title: string, 
                 <span className="shrink-0 text-sm t-secondary" title={new Date(createdAt).toLocaleString()}>
                     {formatter.format(new Date(createdAt))}
                 </span>
+                {(listed === 0 || draft === 1) && <i className="ri-lock-line shrink-0 text-sm t-secondary" title={t('visible.self_only')}/>}
                 <Link href={`/feed/${id}`} target="_blank" rel="noopener noreferrer" className="min-w-0 break-words text-base t-primary hover:text-theme text-pretty [overflow-wrap:anywhere]">
                     {title}
                 </Link>

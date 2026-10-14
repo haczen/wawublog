@@ -59,7 +59,7 @@ export async function searchFeedPage(db: DB, options: SearchFeedPageOptions) {
     );
     const where = options.admin
         ? searchWhere
-        : and(searchWhere, eq(feeds.draft, 0));
+        : and(searchWhere, eq(feeds.draft, 0), eq(feeds.listed, 1));
 
     const [sizeRows, rows] = await Promise.all([
         db.select({ count: count() }).from(feeds).where(where),

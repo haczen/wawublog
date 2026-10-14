@@ -125,15 +125,199 @@ describe('FeedService', () => {
                     tags: [],
                 }),
             }, env);
-            
+
             const res = await app.request('/?type=draft', {
                 method: 'GET',
                 headers: { 'Authorization': 'Bearer mock_token_1' },
             }, env);
-            
+
             expect(res.status).toBe(200);
             const data = await res.json() as any;
             expect(data.size).toBe(1);
+        });
+
+        it('should include unlisted feeds in admin default list', async () => {
+            await app.request('/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer mock_token_1',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: 'Self Only Feed',
+                    content: 'Secret Content',
+                    listed: false,
+                    draft: false,
+                    tags: [],
+                }),
+            }, env);
+
+            const res = await app.request('/', {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer mock_token_1' },
+            }, env);
+
+            expect(res.status).toBe(200);
+            const data = await res.json() as any;
+            expect(data.size).toBe(1);
+            expect(data.data[0].listed).toBe(0);
+        });
+
+        it('should include drafts in admin default list', async () => {
+            await app.request('/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer mock_token_1',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: 'Self Only Draft Feed',
+                    content: 'Secret Draft Content',
+                    listed: true,
+                    draft: true,
+                    tags: [],
+                }),
+            }, env);
+
+            const res = await app.request('/', {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer mock_token_1' },
+            }, env);
+
+            expect(res.status).toBe(200);
+            const data = await res.json() as any;
+            expect(data.size).toBe(1);
+            expect(data.data[0].draft).toBe(1);
+        });
+
+        it('should hide unlisted feeds from non-admin default list', async () => {
+            await app.request('/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer mock_token_1',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: 'Self Only Feed',
+                    content: 'Secret Content',
+                    listed: false,
+                    draft: false,
+                    tags: [],
+                }),
+            }, env);
+
+            const res = await app.request('/', { method: 'GET' }, env);
+
+            expect(res.status).toBe(200);
+            const data = await res.json() as any;
+            expect(data.size).toBe(0);
+            expect(data.data).toEqual([]);
+        });
+
+        it('should hide drafts from non-admin default list', async () => {
+            await app.request('/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer mock_token_1',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: 'Self Only Draft Feed',
+                    content: 'Secret Draft Content',
+                    listed: true,
+                    draft: true,
+                    tags: [],
+                }),
+            }, env);
+
+            const res = await app.request('/', { method: 'GET' }, env);
+
+            expect(res.status).toBe(200);
+            const data = await res.json() as any;
+            expect(data.size).toBe(0);
+            expect(data.data).toEqual([]);
+        });
+    });
+
+    describe('GET /timeline', () => {
+        it('should include unlisted feeds in admin timeline', async () => {
+            await app.request('/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer mock_token_1',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: 'Self Only Feed',
+                    content: 'Secret Content',
+                    listed: false,
+                    draft: false,
+                    tags: [],
+                }),
+            }, env);
+
+            const res = await app.request('/timeline', {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer mock_token_1' },
+            }, env);
+
+            expect(res.status).toBe(200);
+            const data = await res.json() as any;
+            expect(data).toBeArray();
+            expect(data.length).toBe(1);
+            expect(data[0].listed).toBe(0);
+        });
+
+        it('should hide unlisted feeds from non-admin timeline', async () => {
+            await app.request('/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer mock_token_1',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: 'Self Only Feed',
+                    content: 'Secret Content',
+                    listed: false,
+                    draft: false,
+                    tags: [],
+                }),
+            }, env);
+
+            const res = await app.request('/timeline', { method: 'GET' }, env);
+
+            expect(res.status).toBe(200);
+            const data = await res.json() as any;
+            expect(data).toBeArray();
+            expect(data.length).toBe(0);
+        });
+
+        it('should include drafts in admin timeline', async () => {
+            await app.request('/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer mock_token_1',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: 'Self Only Draft Feed',
+                    content: 'Secret Draft Content',
+                    listed: true,
+                    draft: true,
+                    tags: [],
+                }),
+            }, env);
+
+            const res = await app.request('/timeline', {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer mock_token_1' },
+            }, env);
+
+            expect(res.status).toBe(200);
+            const data = await res.json() as any;
+            expect(data).toBeArray();
+            expect(data.length).toBe(1);
+            expect(data[0].draft).toBe(1);
         });
     });
 

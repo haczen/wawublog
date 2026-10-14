@@ -7,6 +7,8 @@ interface TimelineItem {
   id: number;
   title: string | null;
   createdAt: string;
+  listed?: number;
+  draft?: number;
 }
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", { day: "2-digit", month: "2-digit" });
@@ -88,14 +90,15 @@ export function SiteSidebar() {
                   {t("article.total_short$count", { count: items.length })}
                 </span>
               </p>
-              {items.map(({ id, title, createdAt }) => {
+              {items.map(({ id, title, createdAt, listed, draft }) => {
                 const active = String(id) === currentId;
+                const selfOnly = listed === 0 || draft === 1;
                 return (
                   <Link
                     key={id}
                     href={`/feed/${id}`}
                     data-active={active ? "true" : undefined}
-                    title={title || t("unlisted")}
+                    title={title || t("visible.self_only")}
                     className={`group flex items-baseline gap-3 rounded-xl px-3 py-1.5 text-sm transition-colors ${
                       active
                         ? "bg-theme/10 font-medium text-theme"
@@ -103,7 +106,10 @@ export function SiteSidebar() {
                     }`}
                   >
                     <span className="shrink-0 text-xs tabular-nums t-secondary">{dateFormatter.format(new Date(createdAt))}</span>
-                    <span className="min-w-0 flex-1 truncate">{title || t("unlisted")}</span>
+                    {selfOnly ? (
+                      <i className="ri-lock-line shrink-0 self-center text-xs t-secondary" title={t("visible.self_only")} aria-label={t("visible.self_only")} />
+                    ) : null}
+                    <span className="min-w-0 flex-1 truncate">{title || t("visible.self_only")}</span>
                   </Link>
                 );
               })}

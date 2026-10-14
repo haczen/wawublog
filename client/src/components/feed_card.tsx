@@ -129,8 +129,7 @@ export function FeedCard({ id, title, avatar, draft, listed, top, summary, hasht
                     }
                 </p>
                 <p className={`space-x-2 ${styles.meta} ${activeVariant === "editorial" ? "mt-2" : ""}`}>
-                    {draft === 1 && <span>{t("draft")}</span>}
-                    {listed === 0 && <span>{t("unlisted")}</span>}
+                    {(draft === 1 || listed === 0) && <span>{t("visible.self_only")}</span>}
                     {top === 1 && <span className="text-theme">{t('article.top.title')}</span>}
                 </p>
                 <p className={`whitespace-pre-line break-words [overflow-wrap:anywhere] ${styles.summary} ${activeVariant === "editorial" ? "mt-4 max-w-3xl" : ""}`}>{summary}</p>
